@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-${VOLUME_NAME}
+spec:
+  capacity:
+    storage: ${VOLUME_SIZE}Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: ${IP}
+    path: /${VOLUME_PATH}

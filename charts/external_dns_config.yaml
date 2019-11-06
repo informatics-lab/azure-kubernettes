@@ -1,0 +1,19 @@
+sources:
+  - ingress
+
+provider: aws
+
+aws:
+  credentials:
+    accessKey: OVERRIDEME
+    secretKey: OVERRIDEME
+
+txtOwnerId: "k8s"
+
+policy: upsert-only
+
+rbac:
+  create: true
+
+podAnnotations:
+  "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
