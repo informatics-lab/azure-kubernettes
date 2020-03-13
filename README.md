@@ -5,7 +5,7 @@
 
 ## prep
 Link in the secrets
-`ln -s ../private-config/external-dns/azure-secrets.yaml charts/azure-secrets.yaml`
+`ln -s <abs path to repo location>/private-config/external-dns/azure-secrets.yaml charts/azure-secrets.yaml`
 
 
 ## Install from scratch:
