@@ -5,7 +5,7 @@
 
 ## prep
 Link in the secrets
-`ln -s ../private-config/external-dns/azure-secrets.yaml azure/charts/azure-secrets.yaml`
+`ln -s ../private-config/external-dns/azure-secrets.yaml charts/azure-secrets.yaml`
 
 
 ## Install from scratch:
@@ -15,7 +15,7 @@ Work in the `bin` dir:
 `cd bin`
 
 Install from scratch
-`./azure_pangeo_setup -a -r <resource_group/cluster name>`
+`./azure_pangeo_setup -a -r <name_for_resource_group_and_cluster>`
 
 e.g.
 
