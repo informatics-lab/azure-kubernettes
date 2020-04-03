@@ -77,7 +77,7 @@ do
             --vnet $VNET_ID \
             --subnet $SUBNET_ID \
             --usage-threshold $VOLUME_SIZE \
-            --creation-token $UNIQUE_NAME \
+            --file-path $UNIQUE_NAME \
             --protocol-types "NFSv3"
     fi
     
