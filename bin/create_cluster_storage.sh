@@ -21,8 +21,8 @@ CLUSTER_NODE_RESOURCE_GROUP=$(az aks show --resource-group $RESOURCE_GROUP_NAME 
 STORAGE_POOL_NAME="kubernetes-storage"
 SERVICE_LEVEL="Premium"
 STORAGE_ACCOUNT_SIZE=4 #TiB
-declare -a VOLUMES=("homespace" "data" "environments")
-declare -a VOLUME_SIZES=( 1000 2000 500) # GiB
+declare -a VOLUMES=("nfs")
+declare -a VOLUME_SIZES=(4000) # GiB
 
 # Storage account
 if ! az netappfiles account show -n $STORAGE_ACCT_NAME --resource-group $CLUSTER_NODE_RESOURCE_GROUP >/dev/null 2>&1 ; then
@@ -95,67 +95,12 @@ do
     fi
 done
 
-
-
-# # Create volume for homespaces
-# UNIQUE_FILE_PATH=$(echo $STORAGE_ACCT_NAME"-homespace" | tr -cd '[a-zA-Z0-9]' | cut -c1-70) # Please note that creation token needs to be unique within all ANF Accounts
-# VOLUME_NAME=$UNIQUE_FILE_PATH
-# if ! az netappfiles volume show --resource-group $CLUSTER_NODE_RESOURCE_GROUP  --account-name $STORAGE_ACCT_NAME --pool-name $STORAGE_POOL_NAME  --volume-name $VOLUME_NAME  >/dev/null 2>&1 ; then
-#     az netappfiles volume create \
-#         --resource-group $CLUSTER_NODE_RESOURCE_GROUP \
-#         --location $RESOURCE_LOCATION \
-#         --account-name $STORAGE_ACCT_NAME \
-#         --pool-name $STORAGE_POOL_NAME \
-#         --name $VOLUME_NAME \
-#         --service-level $SERVICE_LEVEL \
-#         --vnet $VNET_ID \
-#         --subnet $SUBNET_ID \
-#         --usage-threshold $VOLUME_SIZE_GiB \
-#         --creation-token $UNIQUE_FILE_PATH \
-#         --protocol-types "NFSv3"
-# fi
-
-
-# # Create volume for data
-# DATA_UNIQUE_FILE_PATH=$(echo $STORAGE_ACCT_NAME"-data" | tr -cd '[a-zA-Z0-9]' | cut -c1-70) # Please note that creation token needs to be unique within all ANF Accounts
-# DATA_VOLUME_NAME=$DATA_UNIQUE_FILE_PATH
-# if ! az netappfiles volume show --resource-group $CLUSTER_NODE_RESOURCE_GROUP  --account-name $STORAGE_ACCT_NAME --pool-name $STORAGE_POOL_NAME  --volume-name $DATA_VOLUME_NAME  >/dev/null 2>&1 ; then
-#     az netappfiles volume create \
-#         --resource-group $CLUSTER_NODE_RESOURCE_GROUP \
-#         --location $RESOURCE_LOCATION \
-#         --account-name $STORAGE_ACCT_NAME \
-#         --pool-name $STORAGE_POOL_NAME \
-#         --name $DATA_VOLUME_NAME \
-#         --service-level $SERVICE_LEVEL \
-#         --vnet $VNET_ID \
-#         --subnet $SUBNET_ID \
-#         --usage-threshold $DATA_VOLUME_SIZE_GiB \
-#         --creation-token $DATA_UNIQUE_FILE_PATH \
-#         --protocol-types "NFSv3"
-# fi
-
-
-
-
-# create PV for created storage
-
-# NFS_HOME_IP=$(az netappfiles volume show --resource-group $CLUSTER_NODE_RESOURCE_GROUP --account-name $STORAGE_ACCT_NAME --pool-name $STORAGE_POOL_NAME --volume-name $VOLUME_NAME --query "mountTargets[0].ipAddress" -o tsv)
-# NFS_HOME_PATH=$(az netappfiles volume show --resource-group $CLUSTER_NODE_RESOURCE_GROUP --account-name $STORAGE_ACCT_NAME --pool-name $STORAGE_POOL_NAME --volume-name $VOLUME_NAME --query "creationToken" -o tsv)
-
-# NFS_DATA_IP=$(az netappfiles volume show --resource-group $CLUSTER_NODE_RESOURCE_GROUP --account-name $STORAGE_ACCT_NAME --pool-name $STORAGE_POOL_NAME --volume-name $DATA_VOLUME_NAME --query "mountTargets[0].ipAddress" -o tsv)
-# NFS_DATA_PATH=$(az netappfiles volume show --resource-group $CLUSTER_NODE_RESOURCE_GROUP --account-name $STORAGE_ACCT_NAME --pool-name $STORAGE_POOL_NAME --volume-name $DATA_VOLUME_NAME --query "creationToken" -o tsv)
-
-
-# # Pipe netapp-files-pv.yaml through sed to fill in the correct connection detais
-# if ! kubectl get pv pv-nfs >/dev/null 2>&1 ; then
-#     cat  ../charts/netapp-files-pv.yaml | \
-#         sed "s/[$][{]NFS_HOME_IP[}]/$NFS_HOME_IP/g" |\
-#         sed "s/[$][{]NFS_HOME_PATH[}]/$NFS_HOME_PATH/g" |\
-#         sed "s/[$][{]CLUSTER_NAME[}]/$CLUSTER_NAME/g" |\
-#         sed "s/[$][{]NFS_DATA_IP[}]/$NFS_DATA_IP/g" |\
-#         sed "s/[$][{]NFS_DATA_PATH[}]/$NFS_DATA_PATH/g" |\
-#     kubectl apply -f  - 
-# fi
+# Create storage account for blobs
+if !  az storage account show --name $BLOB_STORAGE_ACCT_NAME >/dev/null 2>&1 ; then
+    az storage account create --name $BLOB_STORAGE_ACCT_NAME \
+                              --resource-group $RESOURCE_GROUP_NAME \
+                              --location $RESOURCE_LOCATION
+fi
 
 # Add blob storage flex volume
 kubectl apply -f https://raw.githubusercontent.com/Azure/kubernetes-volume-drivers/master/flexvolume/blobfuse/deployment/blobfuse-flexvol-installer-1.9.yaml
