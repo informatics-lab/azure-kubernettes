@@ -105,9 +105,9 @@ fi
 # Add blob storage flex volume
 kubectl apply -f https://raw.githubusercontent.com/Azure/kubernetes-volume-drivers/master/flexvolume/blobfuse/deployment/blobfuse-flexvol-installer-1.9.yaml
 
-BLOB_FUSE_SECRET_NAME="blobfusecreds"
-BLOB_STORAGE_ACCT_KEY=$(az storage account keys list --account-name $BLOB_STORAGE_ACCT_NAME --query "[?permissions == 'Full'] | [0].value" --output tsv)
-if kubectl -n default get secret $BLOB_FUSE_SECRET_NAME >/dev/null 2>&1  ; then
-    kubectl -n default delete secret $BLOB_FUSE_SECRET_NAME
-fi
-kubectl create secret generic $BLOB_FUSE_SECRET_NAME -n default --from-literal accountname=$BLOB_STORAGE_ACCT_NAME --from-literal accountkey=$BLOB_STORAGE_ACCT_KEY --type="azure/blobfuse"
+# BLOB_FUSE_SECRET_NAME="blobfusecreds"
+# BLOB_STORAGE_ACCT_KEY=$(az storage account keys list --account-name $BLOB_STORAGE_ACCT_NAME --query "[?permissions == 'Full'] | [0].value" --output tsv)
+# if kubectl -n default get secret $BLOB_FUSE_SECRET_NAME >/dev/null 2>&1  ; then
+#     kubectl -n default delete secret $BLOB_FUSE_SECRET_NAME
+# fi
+# kubectl create secret generic $BLOB_FUSE_SECRET_NAME -n default --from-literal accountname=$BLOB_STORAGE_ACCT_NAME --from-literal accountkey=$BLOB_STORAGE_ACCT_KEY --type="azure/blobfuse"
