@@ -1,7 +1,6 @@
 ## some tips
 
 * Install the azure cli - https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest
-* Follow the ["before you begin"](https://docs.microsoft.com/en-us/azure/aks/use-multiple-node-pools#before-you-begin)
 
 ## prep
 Link in the secrets
