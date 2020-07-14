@@ -11,6 +11,7 @@ set -ex
 az aks get-credentials -g $RESOURCE_GROUP_NAME -n $CLUSTER_NAME --overwrite-existing
 
 # Create dashboard rbac config.
+# This maynot work due to existing 'dashboard rbac' if so try uncommeting.
 kubectl apply -f ../charts/dashboard_rbac.yaml
 
 # Install and update helm and tiller.
@@ -52,8 +53,9 @@ kubectl create namespace cert-manager
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
 
 # Install the cert-manager helm chart.
+# Previous verions v0.8.1 - new version needed for k8 v1.16+
 helm upgrade --install --namespace cert-manager cert-manager jetstack/cert-manager \
-             --version v0.8.1 -f ../charts/cert-manager-config.yaml
+             --version v0.15.1 -f ../charts/cert-manager-config.yaml
 
 # Apply the cluster issuer.
 kubectl apply -f ../charts/cluster-issuer.yaml
