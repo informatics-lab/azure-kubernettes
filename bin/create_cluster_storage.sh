@@ -95,15 +95,15 @@ do
     fi
 done
 
-# Create storage account for blobs
-if !  az storage account show --name $BLOB_STORAGE_ACCT_NAME >/dev/null 2>&1 ; then
-    az storage account create --name $BLOB_STORAGE_ACCT_NAME \
-                              --resource-group $RESOURCE_GROUP_NAME \
-                              --location $RESOURCE_LOCATION
-fi
+# # Create storage account for blobs
+# if !  az storage account show --name $BLOB_STORAGE_ACCT_NAME >/dev/null 2>&1 ; then
+#     az storage account create --name $BLOB_STORAGE_ACCT_NAME \
+#                               --resource-group $RESOURCE_GROUP_NAME \
+#                               --location $RESOURCE_LOCATION
+# fi
 
-# Add blob storage flex volume
-kubectl apply -f https://raw.githubusercontent.com/Azure/kubernetes-volume-drivers/master/flexvolume/blobfuse/deployment/blobfuse-flexvol-installer-1.9.yaml
+# # Add blob storage flex volume
+# kubectl apply -f https://raw.githubusercontent.com/Azure/kubernetes-volume-drivers/master/flexvolume/blobfuse/deployment/blobfuse-flexvol-installer-1.9.yaml
 
 # BLOB_FUSE_SECRET_NAME="blobfusecreds"
 # BLOB_STORAGE_ACCT_KEY=$(az storage account keys list --account-name $BLOB_STORAGE_ACCT_NAME --query "[?permissions == 'Full'] | [0].value" --output tsv)

@@ -10,9 +10,13 @@ set -ex
 # Get kubernetes credentials for AKS resource.
 az aks get-credentials -g $RESOURCE_GROUP_NAME -n $CLUSTER_NAME --overwrite-existing
 
-# Create dashboard rbac config.
-# This maynot work due to existing 'dashboard rbac' if so try uncommeting.
-kubectl apply -f ../charts/dashboard_rbac.yaml
+# # Install dashboard
+# if kubectl get ClusterRoleBinding kubernetes-dashboard  >/dev/null 2>&1 ; then 
+#     # The install creates this so delete the existing one if exists.
+#     kubectl delete ClusterRoleBinding kubernetes-dashboard
+# fi
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+
 
 # Install and update helm and tiller.
 kubectl apply -f ../charts/helm_rbac.yaml
@@ -28,34 +32,18 @@ helm upgrade --install --namespace kube-system nginx-ingress stable/nginx-ingres
 ################
 # Cert Manager #
 ################
-#
-# The old way of doing things...
 
-# kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
-# # ...Label the already-existing namespace.
-# kubectl label namespace kube-system certmanager.k8s.io/disable-validation="true" || true
-# helm upgrade --install --namespace kube-system cert-manager stable/cert-manager \
-#             --set ingressShim.defaultIssuerName=letsencrypt \
-#             --set ingressShim.defaultIssuerKind=ClusterIssuer
 
-# And the new.
-# See https://docs.cert-manager.io/en/latest/getting-started/install/kubernetes.html.
-
-# Add the Jetstack Helm repository and update repo list.
+kubectl create namespace cert-manager
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
+helm install \
+  --name cert-manager \
+  --namespace cert-manager \
+  --version v0.16.0 \
+  jetstack/cert-manager \
+  --set installCRDs=true \
+   -f ../charts/cert-manager-config.yaml
 
-# Install the CustomResourceDefinition resources separately
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
-
-# Create a cert-manager namespace, and label it to disable resource validation.
-kubectl create namespace cert-manager
-kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
-
-# Install the cert-manager helm chart.
-# Previous verions v0.8.1 - new version needed for k8 v1.16+
-helm upgrade --install --namespace cert-manager cert-manager jetstack/cert-manager \
-             --version v0.15.1 -f ../charts/cert-manager-config.yaml
-
-# Apply the cluster issuer.
+# # Apply the cluster issuer.
 kubectl apply -f ../charts/cluster-issuer.yaml

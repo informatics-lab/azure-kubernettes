@@ -36,7 +36,7 @@ az aks create \
   --resource-group $RESOURCE_GROUP_NAME \
   --name $CLUSTER_NAME \
   --location $RESOURCE_LOCATION \
-  --kubernetes-version 1.14.8 \
+  --kubernetes-version 1.15.12 \
   --node-vm-size Standard_B16ms \
   --nodepool-name $DEFAULT_NODEPOOL\
   --enable-vmss \
